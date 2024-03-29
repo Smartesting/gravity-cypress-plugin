@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts", "test/"],
+  "compilerOptions": {
+    "noEmit": false,
+    "target": "ES5",
+    "declaration": true
+  }
+}
