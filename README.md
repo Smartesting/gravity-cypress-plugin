@@ -1,5 +1,7 @@
 # gravity-cypress-plugin
 
+[![Node.js CI](https://github.com/Smartesting/gravity-cypress-plugin/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Smartesting/gravity-cypress-plugin/actions/workflows/node.js.yml)
+
 ## Setting up the plugin
 
 Your first have to install the plugin in your project:
