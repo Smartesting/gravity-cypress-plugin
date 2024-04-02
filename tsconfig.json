@@ -13,11 +13,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["cypress"],
+    "types": ["node", "cypress"]
   },
   "include": [
     "src/**/*.ts",
-    "index.ts"
+    "index.ts",
+    "node_modules/@types/node/globals.global.d.ts"
   ],
   "exclude": [
     "node_modules"
