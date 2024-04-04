@@ -1,12 +1,16 @@
 import cFetch from "cross-fetch";
-import { CollectorOptions } from "@smartesting/gravity-data-collector";
-import NullLogger from "./logger/NullLogger";
+import NullLogger from "../logger/NullLogger";
+import {CollectorOptions} from "@smartesting/gravity-data-collector";
+import ILogger from "../logger/ILogger";
 
 export type CollectorOptionsWithAuthKey = Partial<CollectorOptions> & { authKey: string }
+
 export default function gravityCypressPlugin(
     on: Cypress.PluginEvents,
     _config: Cypress.PluginConfigOptions,
-    collectorOptions: CollectorOptionsWithAuthKey
+    collectorOptions: CollectorOptionsWithAuthKey,
+    logger: ILogger = console,
+    fetch = cFetch
 ) {
     const sessionIdByTest: Record<string, string> = {};
 
@@ -24,9 +28,9 @@ export default function gravityCypressPlugin(
             sessionIdByTest[titlePath.join("/")] = sessionId;
             return sessionIdByTest;
         }
-    });
+    })
 
-    on("after:spec", async (_spec, results, fetch = cFetch, logger = new NullLogger()) => {
+    on("after:spec", async (_spec, results) => {
         const gravityServerUrl = collectorOptions.gravityServerUrl ?? 'https://api.gravity.smartesting.com'
 
         for (const test of results.tests) {
@@ -39,7 +43,7 @@ export default function gravityCypressPlugin(
                     url,
                     {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {"Content-Type": "application/json"},
                         body: JSON.stringify({
                             testName: test.title.slice(-1)[0],
                             testPath: test.title.slice(0, -1).join(" / "),
@@ -58,5 +62,5 @@ export default function gravityCypressPlugin(
                 logger.error(`No session id found for test: ${testTitle}`);
             }
         }
-    });
+    })
 }

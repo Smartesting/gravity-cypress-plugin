@@ -1,64 +1,67 @@
-import assert from 'assert';
-import gravityCypressPlugin, {CollectorOptionsWithAuthKey} from "./gravityCypressPlugin";
-import { v4 as uuidv4} from 'uuid'
-import sinon from 'sinon'
-import fetch from "cross-fetch";
-import ILogger from "./logger/ILogger";
+import assert from "assert";
+import MockCy from "../test-utils/MockCy";
 import {beforeEach} from "mocha";
+import {v4 as uuidv4} from "uuid";
+import sinon from "sinon";
+import TestLogger from "../test-utils/TestLogger";
+import gravityCypressPlugin, {CollectorOptionsWithAuthKey} from "./gravityCypressPlugin";
 
-type AfterSpec = (spec: Cypress.Spec, results: CypressCommandLine.RunResult, f: typeof fetch, logger: ILogger) => void | Promise<void>
 describe('gravityCypressPlugin', () => {
-    let tasks: Cypress.Tasks
-    let afterSpec: AfterSpec
-    let mockOn: Cypress.PluginEvents = (key, value) => {
-        if (key === 'task') {
-            tasks = value as Cypress.Tasks
-        }
-
-        if (key === 'after:spec') {
-            afterSpec = value as AfterSpec
-        }
-    }
+    let mockCy: MockCy
+    let logger: TestLogger
+    let stubFetch: sinon.SinonStub
 
     const config = {} as Cypress.PluginConfigOptions
 
     beforeEach(() => {
-        tasks = {}
-        afterSpec = () => {}
+        mockCy = new MockCy()
+        logger = new TestLogger()
+        stubFetch = sinon.stub().returns({json: async () => ({error: null})})
     })
 
     describe('task: gravity:getCollectorOptions', () => {
-        it('returns the collectorOptions provided on setup', () => {
-            const collectorOptions: CollectorOptionsWithAuthKey = { authKey: '123-456-789', buildId: "123" }
-            gravityCypressPlugin(mockOn, config, collectorOptions)
+        it('returns the collectorOptions provided on setup', async () => {
+            return new Promise(resolve => {
+                const collectorOptions: CollectorOptionsWithAuthKey = {authKey: '123-456-789', buildId: "123"}
+                gravityCypressPlugin(mockCy.onPlugin.bind(mockCy), config, collectorOptions, logger, stubFetch)
 
-            assert.deepStrictEqual(
-                tasks['gravity:getCollectorOptions'](undefined),
-                collectorOptions
-            )
+                mockCy.task('gravity:getCollectorOptions').then((result) => {
+                    assert.deepStrictEqual(result, collectorOptions)
+                    resolve()
+                })
+            })
         })
     })
 
     describe('task: gravity:storeCurrentSessionId', () => {
-        it('updates the registry for session ids by test', () => {
-            gravityCypressPlugin(mockOn, config, {authKey: ''})
+        it('updates the registry for session ids by test', async () => {
+            return new Promise(resolve => {
+                gravityCypressPlugin(mockCy.onPlugin.bind(mockCy), config, {authKey: ''}, logger, stubFetch)
 
-            tasks['gravity:storeCurrentSessionId']({sessionId: '123-456', titlePath: ['My spec', 'My first test']})
-            const registry = tasks['gravity:storeCurrentSessionId']({sessionId: '456-789', titlePath: ['My spec', 'My second test']})
-
-            assert.deepStrictEqual(
-                registry,
-                {
-                    'My spec/My first test': '123-456',
-                    'My spec/My second test': '456-789'
-                }
-            )
+                mockCy.task('gravity:storeCurrentSessionId', {
+                    sessionId: '123-456',
+                    titlePath: ['My spec', 'My first test']
+                }).then(() => {
+                    mockCy.task('gravity:storeCurrentSessionId', {
+                        sessionId: '456-789',
+                        titlePath: ['My spec', 'My second test']
+                    }).then((registry) => {
+                        assert.deepStrictEqual(
+                            registry,
+                            {
+                                'My spec/My first test': '123-456',
+                                'My spec/My second test': '456-789'
+                            }
+                        )
+                        resolve()
+                    })
+                })
+            })
         })
     })
 
     describe('after:spec', () => {
         const authKey = uuidv4()
-        let stubFetch: sinon.SinonStub
 
         const spec: Cypress.Spec = {
             name: 'My spec',
@@ -101,33 +104,22 @@ describe('gravityCypressPlugin', () => {
             screenshots: []
         }
 
-        let logs: any[][] = []
-        let errors: any[][] = []
-
-        const logger: ILogger = {
-            log(...data) { logs.push(data) },
-            error(...data) { errors.push(data)},
-        }
-
 
         beforeEach(() => {
-            gravityCypressPlugin(mockOn, config, { authKey })
-            stubFetch = sinon.stub().returns({json: async () => ({error: null})})
-            logs = []
-            errors = []
+            gravityCypressPlugin(mockCy.onPlugin.bind(mockCy), config, {authKey}, logger, stubFetch)
         })
 
         context('when no session id is found for the test', () => {
             it('does not fetch any data', async () => {
-                await afterSpec(spec, results, stubFetch, logger)
+                await mockCy.triggerAfterSpec(spec, results)
 
                 sinon.assert.notCalled(stubFetch)
             })
 
             it('logs an error for each test which does not have an associated testId', async () => {
-                await afterSpec(spec, results, stubFetch, logger)
+                await mockCy.triggerAfterSpec(spec, results)
 
-                assert.deepStrictEqual(errors, [
+                assert.deepStrictEqual(logger.errors, [
                     ['No session id found for test: My spec/My first test'],
                     ['No session id found for test: My spec/My second test']
                 ])
@@ -136,18 +128,17 @@ describe('gravityCypressPlugin', () => {
 
         context('when sessions ids are recorded for the tests', () => {
             beforeEach(() => {
-                tasks['gravity:storeCurrentSessionId']({sessionId: '123-456', titlePath: results.tests[0].title})
-                tasks['gravity:storeCurrentSessionId']({sessionId: '456-789', titlePath: results.tests[1].title})
+                mockCy.task('gravity:storeCurrentSessionId', {sessionId: '123-456', titlePath: results.tests[0].title})
+                mockCy.task('gravity:storeCurrentSessionId', {sessionId: '456-789', titlePath: results.tests[1].title})
             })
 
             it('does not log any error', async () => {
-                await afterSpec(spec, results, stubFetch, logger)
-
-                assert.deepStrictEqual(errors, [])
+                await mockCy.triggerAfterSpec(spec, results)
+                assert.deepStrictEqual(logger.errors, [])
             })
 
             it('identifies each test on Gravity', async () => {
-                await afterSpec(spec, results, stubFetch, logger)
+                await mockCy.triggerAfterSpec(spec, results)
                 sinon.assert.callCount(stubFetch, 2)
 
                 sinon.assert.calledWith(
@@ -186,10 +177,10 @@ describe('gravityCypressPlugin', () => {
             })
 
             it('uses the custom Gravity domain if provided in the collectorConfiguration', async () => {
-                gravityCypressPlugin(mockOn, config, { authKey, gravityServerUrl: 'http://localhost:3000' })
-                tasks['gravity:storeCurrentSessionId']({sessionId: '123-456', titlePath: results.tests[0].title})
-                tasks['gravity:storeCurrentSessionId']({sessionId: '456-789', titlePath: results.tests[1].title})
-                await afterSpec(spec, results, stubFetch, logger)
+                gravityCypressPlugin(mockCy.onPlugin.bind(mockCy), config, { authKey, gravityServerUrl: 'http://localhost:3000' }, logger, stubFetch)
+                mockCy.task('gravity:storeCurrentSessionId', {sessionId: '123-456', titlePath: results.tests[0].title})
+                mockCy.task('gravity:storeCurrentSessionId', {sessionId: '456-789', titlePath: results.tests[1].title})
+                await mockCy.triggerAfterSpec(spec, results)
 
                 sinon.assert.callCount(stubFetch, 2)
 
@@ -205,9 +196,9 @@ describe('gravityCypressPlugin', () => {
             })
 
             it('logs the requests and responses', async () => {
-                await afterSpec(spec, results, stubFetch, logger)
+                await mockCy.triggerAfterSpec(spec, results)
 
-                assert.deepStrictEqual(logs, [
+                assert.deepStrictEqual(logger.logs, [
                     [{
                         url: `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/123-456/identifyTest`,
                         response: {error: null}
