@@ -6,6 +6,9 @@
   "files": [
     "/dist"
   ],
+  "engines": {
+    "node": ">=16.x"
+  },
   "scripts": {
     "tsc": "tsc",
     "build": "tsc --project tsconfig.build.json --outDir dist",
