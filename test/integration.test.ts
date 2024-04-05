@@ -32,6 +32,8 @@ describe('Integration test', function () {
     })
 
     async function runCypressTests() {
+        process.env.TEST_SERVER_PORT = `${port}`
+
         try {
             await run({
                 browser: 'electron',
@@ -81,7 +83,6 @@ describe('Integration test', function () {
     }
 
     it('properly emits events to Gravity', async () => {
-        process.env.TEST_SERVER_PORT = `${port}`
         await runCypressTests()
 
         const settingsLog = logs.filter(log => log.url.endsWith('/settings'))
@@ -89,6 +90,15 @@ describe('Integration test', function () {
 
         const identifyLogs = logs.filter(log => log.url.endsWith('/identifyTest'))
         assert.strictEqual(identifyLogs.length, 2, 'Each test has been identified on Gravity')
+    })
+
+    context('when gravityCypressPlugin is not called in setupNodeEvents', () => {
+        it('still run the tests', async () => {
+            process.env.DISABLE_GRAVITY_PLUGIN = '1'
+            await runCypressTests()
+
+            assert.strictEqual(logs.length, 2)
+        })
     })
 })
 

@@ -8,12 +8,14 @@ export default defineConfig({
   e2e: {
     baseUrl,
     setupNodeEvents(on, config) {
-      gravityCypressPlugin(on, config, {
-        authKey: uuidv4(),
-        gravityServerUrl: baseUrl,
-        requestInterval: 1,
-        debug: false
-      })
+      if (!process.env.DISABLE_GRAVITY_PLUGIN) {
+        gravityCypressPlugin(on, config, {
+          authKey: uuidv4(),
+          gravityServerUrl: baseUrl,
+          requestInterval: 1,
+          debug: false
+        })
+      }
     },
   },
 });

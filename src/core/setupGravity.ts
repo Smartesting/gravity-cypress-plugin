@@ -3,13 +3,13 @@ import CyLike from "./CyLike";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
 import {CollectorOptions} from "@smartesting/gravity-data-collector";
 
-import ignoreCypressMissingTask from "../utils/ignoreCypressMissingTask";
+import ignoreGravityMissingTasks from "../utils/ignoreGravityMissingTasks";
 
 export default function setupGravity(
     cy: CyLike,
     logger: ILogger
 ) {
-    ignoreCypressMissingTask(cy, 'gravity:getCollectorOptions', logger)
+    ignoreGravityMissingTasks(cy, logger)
 
     cy.task("gravity:getCollectorOptions")
         .then((collectorOptions) => {

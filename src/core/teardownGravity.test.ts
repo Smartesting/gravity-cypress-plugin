@@ -40,6 +40,14 @@ describe('teardownGravity', () => {
         ])
     })
 
+    it('does not fail if GravityCollector was not properly installed', () => {
+        gravityDataCollectorStub.throws(new Error("Cannot read properties of undefined (reading 'collectorWrapper')"))
+        teardownGravity(mockCy, mockCypress, logger)
+        assert.deepStrictEqual(logger.errors, [
+            ['cy.task("gravity:storeCurrentSessionId") is not defined. Did you add "gravityCypressPlugin(...)" in your E2E setup']
+        ])
+    })
+
     context('when gravityCypressPlugin() has been properly called', () => {
         let callbackSpy: sinon.SinonSpy
 

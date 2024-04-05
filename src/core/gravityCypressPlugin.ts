@@ -8,8 +8,8 @@ export default function gravityCypressPlugin(
     on: Cypress.PluginEvents,
     _config: Cypress.PluginConfigOptions,
     collectorOptions: CollectorOptionsWithAuthKey,
-    logger: ILogger = console,
-    fetch = cFetch
+    logger: ILogger,
+    fetch: typeof cFetch
 ) {
     const sessionIdByTest: Record<string, string> = {};
 

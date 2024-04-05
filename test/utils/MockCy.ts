@@ -54,7 +54,7 @@ export default class MockCy implements CyLike {
         const callback = this.tasks[taskName]
 
         if (!callback) {
-            this.fail(new Error(`Missing task: ${taskName}`))
+            this.fail(new Error(`CypressError: \`cy.task('${taskName}')\` failed with the following error`))
             return {
                 then: () => {}
             } as unknown as Cypress.Chainable<S>
