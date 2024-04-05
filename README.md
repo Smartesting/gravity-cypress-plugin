@@ -25,13 +25,16 @@ module.exports = defineConfig({
 You will then need to set up some before/after each hook. This can be done in `cypress/support/e2e.ts`:
 
 ```typescript
-import { setupGravity, teardownGravity} from '@smartesting/gravity-cypress-plugin'
+import {
+  setupGravity,
+  teardownGravity,
+} from "@smartesting/gravity-cypress-plugin";
 
 beforeEach(() => {
-    setupGravity();
-})
+  setupGravity();
+});
 
 afterEach(() => {
-    teardownGravity();
-})
+  teardownGravity();
+});
 ```

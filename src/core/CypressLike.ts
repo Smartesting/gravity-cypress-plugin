@@ -1,3 +1,3 @@
-type CypressLike = Pick<Cypress.Cypress, 'currentTest'>
+type CypressLike = Pick<Cypress.Cypress, "currentTest">;
 
-export default CypressLike
+export default CypressLike;

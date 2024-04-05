@@ -17,7 +17,9 @@
     "test:integration": "ts-mocha --config .mocharc.integration.json",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --e2e --browser=electron",
-    "start:server": "ts-node test/utils/testServer.ts"
+    "start:server": "ts-node test/utils/testServer.ts",
+    "prettier:check": "prettier . --check",
+    "prettier:write": "prettier . --write"
   },
   "dependencies": {
     "@smartesting/gravity-data-collector": "https://smartesting.github.io/gravity-data-collector/v5.0.0-beta/smartesting-gravity-data-collector.tgz",
@@ -35,6 +37,7 @@
     "express": "^4.19.2",
     "jsdom": "^24.0.0",
     "mocha": "^10.4.0",
+    "prettier": "3.2.5",
     "sinon": "^17.0.1",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",

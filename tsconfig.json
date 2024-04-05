@@ -15,13 +15,6 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["node", "cypress"]
   },
-  "include": [
-    "src/**/*.ts",
-    "cypress/**/*.ts",
-    "test/**/*.ts",
-    "index.ts",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "cypress/**/*.ts", "test/**/*.ts", "index.ts"],
+  "exclude": ["node_modules"]
 }

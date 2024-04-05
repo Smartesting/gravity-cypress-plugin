@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main']
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: 'pages'
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
@@ -32,12 +32,12 @@ jobs:
       - name: Create pages
         uses: Smartesting/publish-on-pages@main
         with:
-          tags: '*-beta'
+          tags: "*-beta"
           library_name: smartesting-gravity-cypress-plugin
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          path: 'pages'
+          path: "pages"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

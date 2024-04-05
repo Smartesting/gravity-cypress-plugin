@@ -1,22 +1,30 @@
-import gravityCypressPluginCore, {CollectorOptionsWithAuthKey} from "./src/core/gravityCypressPlugin";
+import gravityCypressPluginCore, {
+  CollectorOptionsWithAuthKey,
+} from "./src/core/gravityCypressPlugin";
 import ILogger from "./src/logger/ILogger";
 import NullLogger from "./src/logger/NullLogger";
 import setupGravityCore from "./src/core/setupGravity";
 import teardownGravityCore from "./src/core/teardownGravity";
-import fetch from 'cross-fetch'
+import fetch from "cross-fetch";
 
 export function gravityCypressPlugin(
-    on: Cypress.PluginEvents,
-    config: Cypress.PluginConfigOptions,
-    collectorOptions: CollectorOptionsWithAuthKey
+  on: Cypress.PluginEvents,
+  config: Cypress.PluginConfigOptions,
+  collectorOptions: CollectorOptionsWithAuthKey,
 ) {
-    return gravityCypressPluginCore(on, config, collectorOptions, new NullLogger(), fetch)
+  return gravityCypressPluginCore(
+    on,
+    config,
+    collectorOptions,
+    new NullLogger(),
+    fetch,
+  );
 }
 
 export function setupGravity(logger: ILogger = new NullLogger()) {
-    setupGravityCore(cy, logger)
+  setupGravityCore(cy, logger);
 }
 
 export function teardownGravity(logger: ILogger = new NullLogger()) {
-    teardownGravityCore(cy, Cypress, logger)
+  teardownGravityCore(cy, Cypress, logger);
 }
