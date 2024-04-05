@@ -2,7 +2,8 @@ import ILogger from "../logger/ILogger";
 import CyLike from "./CyLike";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
 import {CollectorOptions} from "@smartesting/gravity-data-collector";
-import ignoreCypressMissingTask from "../utils/ignoreCypressMissingTask.test";
+
+import ignoreCypressMissingTask from "../utils/ignoreCypressMissingTask";
 
 export default function setupGravity(
     cy: CyLike,

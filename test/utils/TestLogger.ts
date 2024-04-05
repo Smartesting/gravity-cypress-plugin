@@ -1,4 +1,4 @@
-import ILogger from "../logger/ILogger";
+import ILogger from "../../src/logger/ILogger";
 
 export default class TestLogger implements ILogger {
     public readonly logs: any[][] = []

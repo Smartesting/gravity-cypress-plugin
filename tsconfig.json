@@ -17,6 +17,8 @@
   },
   "include": [
     "src/**/*.ts",
+    "cypress/**/*.ts",
+    "test/**/*.ts",
     "index.ts",
   ],
   "exclude": [

@@ -1,5 +1,4 @@
 import cFetch from "cross-fetch";
-import NullLogger from "../logger/NullLogger";
 import {CollectorOptions} from "@smartesting/gravity-data-collector";
 import ILogger from "../logger/ILogger";
 

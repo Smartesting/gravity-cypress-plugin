@@ -2,7 +2,8 @@ import CyLike from "./CyLike";
 import CypressLike from "./CypressLike";
 import ILogger from "../logger/ILogger";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
-import ignoreCypressMissingTask from "../utils/ignoreCypressMissingTask.test";
+
+import ignoreCypressMissingTask from "../utils/ignoreCypressMissingTask";
 
 export default function teardownGravity(
     cy: CyLike,

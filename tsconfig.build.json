@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "exclude": [
     "src/**/*.test.ts",
-    "src/test-utils/"
+    "test/test-utils/",
+    "cypress/",
+    "cypress.config.ts"
   ],
   "compilerOptions": {
     "noEmit": false,

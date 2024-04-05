@@ -1,5 +1,5 @@
-import TestLogger from "../test-utils/TestLogger";
-import MockCy from "../test-utils/MockCy";
+import TestLogger from "../../test/utils/TestLogger";
+import MockCy from "../../test/utils/MockCy";
 import setupGravity from "./setupGravity";
 import assert from "assert";
 import {JSDOM} from "jsdom";
@@ -7,7 +7,7 @@ import {CollectorOptionsWithAuthKey} from "./gravityCypressPlugin";
 import {v4 as uuidv4} from "uuid";
 import sinon from "sinon";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
-import waitForAssertion from "../test-utils/waitForAssertion";
+import waitForAssertion from "../../test/utils/waitForAssertion";
 
 describe('setupGravity', () => {
     let logger: TestLogger

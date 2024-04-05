@@ -1,18 +1,9 @@
 import CyLike from "../core/CyLike";
-import MockCy from "../test-utils/MockCy";
+import MockCy from "../../test/utils/MockCy";
 import assert from 'assert'
-import ILogger from "../logger/ILogger";
-import TestLogger from "../test-utils/TestLogger";
+import TestLogger from "../../test/utils/TestLogger";
+import ignoreCypressMissingTask from "./ignoreCypressMissingTask";
 
-export default function ignoreCypressMissingTask(cy: CyLike, taskName: string, logger: ILogger) {
-    cy.on("fail", (err) => {
-        if (err.message.includes(taskName)) {
-            logger.error(`cy.task("${taskName}") is not defined. Did you add "gravityCypressPlugin(...)" in your E2E setup`);
-            return false;
-        }
-        throw err
-    });
-}
 describe('ignoreCypressMissingtask', () => {
     let mockCy: CyLike
     let logger: TestLogger

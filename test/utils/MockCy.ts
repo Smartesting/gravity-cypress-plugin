@@ -1,6 +1,6 @@
-import CyLike from "../core/CyLike";
+import CyLike from "../../src/core/CyLike";
 import fetch from "cross-fetch";
-import ILogger from "../logger/ILogger";
+import ILogger from "../../src/logger/ILogger";
 
 type GenericCallback = (...args: any[]) => unknown
 type Tasks = { [key: string]: GenericCallback }

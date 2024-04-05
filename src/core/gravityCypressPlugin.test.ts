@@ -1,9 +1,9 @@
 import assert from "assert";
-import MockCy from "../test-utils/MockCy";
+import MockCy from "../../test/utils/MockCy";
 import {beforeEach} from "mocha";
 import {v4 as uuidv4} from "uuid";
 import sinon from "sinon";
-import TestLogger from "../test-utils/TestLogger";
+import TestLogger from "../../test/utils/TestLogger";
 import gravityCypressPlugin, {CollectorOptionsWithAuthKey} from "./gravityCypressPlugin";
 
 describe('gravityCypressPlugin', () => {
