@@ -63,6 +63,7 @@ describe('Integration test', function () {
             })
             app.use(makeTestRouter())
             const server = app.listen('3001', () => {
+                console.log('[Test server] Listening on pot 3001')
                 resolve(async () => {
                     server.close()
                 })
