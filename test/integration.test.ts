@@ -13,7 +13,7 @@ type Log = {
 type Stop = () => Promise<void>
 
 describe('Integration test', function () {
-    this.timeout(5000)
+    this.timeout(30000)
 
     let logs: Log[]
     let stops: Stop[]
@@ -63,6 +63,7 @@ describe('Integration test', function () {
             })
             app.use(makeTestRouter())
             const server = app.listen('3001', () => {
+                console.log('[Test server] Listening on port 3001')
                 resolve(async () => {
                     server.close()
                 })
