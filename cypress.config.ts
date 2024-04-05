@@ -1,13 +1,16 @@
 import {defineConfig} from "cypress";
 import {gravityCypressPlugin} from "./index";
+import { v4 as uuidv4 } from 'uuid'
+
+const baseUrl = `http://localhost:${process.env.TEST_SERVER_PORT ?? '3001'}`
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3001',
+    baseUrl,
     setupNodeEvents(on, config) {
       gravityCypressPlugin(on, config, {
-        authKey: '8cba94d3-b892-40df-855b-b55623b4ea21',
-        gravityServerUrl: 'http://localhost:3001',
+        authKey: uuidv4(),
+        gravityServerUrl: baseUrl,
         requestInterval: 1,
         debug: false
       })

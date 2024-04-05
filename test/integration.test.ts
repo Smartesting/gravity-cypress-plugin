@@ -3,6 +3,7 @@ import makeTestRouter from "./utils/testServerRouter";
 import assert from 'assert'
 
 import { run } from 'cypress'
+import { AddressInfo } from "net";
 
 type Log = {
     method: string
@@ -13,8 +14,9 @@ type Log = {
 type Stop = () => Promise<void>
 
 describe('Integration test', function () {
-    this.timeout(30000)
+    this.timeout(process.env.INTEGRATION_TEST_TIMEOUT ?? 5000)
 
+    let port: number
     let logs: Log[]
     let stops: Stop[]
 
@@ -41,7 +43,7 @@ describe('Integration test', function () {
         }
     }
     async function startServer(): Promise<Stop> {
-        return new Promise<Stop>(resolve => {
+        return new Promise<Stop>((resolve, reject) => {
             const app = express()
             app.use((req, _res, next) => {
                 const log: Log = {
@@ -62,8 +64,14 @@ describe('Integration test', function () {
                 next()
             })
             app.use(makeTestRouter())
-            const server = app.listen('3001', () => {
-                console.log('[Test server] Listening on port 3001')
+            const server = app.listen(0, () => {
+                const serverAddress = server.address()
+                if (!isAddressInfo(serverAddress)) {
+                    return reject(new Error('Express start did not return an address'))
+                }
+                port = serverAddress.port
+
+                console.log(`[Test server] Listening on port ${port}`)
                 resolve(async () => {
                     server.close()
                 })
@@ -73,6 +81,7 @@ describe('Integration test', function () {
     }
 
     it('properly emits events to Gravity', async () => {
+        process.env.TEST_SERVER_PORT = `${port}`
         await runCypressTests()
 
         const settingsLog = logs.filter(log => log.url.endsWith('/settings'))
@@ -82,3 +91,7 @@ describe('Integration test', function () {
         assert.strictEqual(identifyLogs.length, 2, 'Each test has been identified on Gravity')
     })
 })
+
+function isAddressInfo(tbd: unknown): tbd is AddressInfo {
+    return tbd !== null && typeof tbd === 'object' && (tbd as AddressInfo).port !== undefined
+}

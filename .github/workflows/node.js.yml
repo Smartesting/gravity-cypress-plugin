@@ -39,4 +39,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: npm ci
-      - run: npm run test:integration
+      - run: INTEGRATION_TEST_TIMEOUT=30000 npm run test:integration
