@@ -19,7 +19,8 @@
     "cypress:run": "cypress run --e2e --browser=electron",
     "start:server": "ts-node test/utils/testServer.ts",
     "prettier:check": "prettier . --check",
-    "prettier:write": "prettier . --write"
+    "prettier:write": "prettier . --write",
+    "prepare": "husky"
   },
   "dependencies": {
     "@smartesting/gravity-data-collector": "https://smartesting.github.io/gravity-data-collector/v5.0.0-beta/smartesting-gravity-data-collector.tgz",
@@ -35,7 +36,9 @@
     "assert": "^2.1.0",
     "cypress": "^13.7.2",
     "express": "^4.19.2",
+    "husky": "^9.0.11",
     "jsdom": "^24.0.0",
+    "lint-staged": "^15.2.2",
     "mocha": "^10.4.0",
     "prettier": "3.2.5",
     "sinon": "^17.0.1",
@@ -45,5 +48,8 @@
   },
   "peerDependencies": {
     "cypress": "^13.7.0"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
