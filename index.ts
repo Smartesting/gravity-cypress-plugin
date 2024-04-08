@@ -10,14 +10,9 @@ export function gravityCypressPlugin(
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions,
   collectorOptions: Partial<CollectorOptions>,
+  logger: ILogger = new NullLogger(),
 ) {
-  return gravityCypressPluginCore(
-    on,
-    config,
-    collectorOptions,
-    new NullLogger(),
-    fetch,
-  );
+  return gravityCypressPluginCore(on, config, collectorOptions, logger, fetch);
 }
 
 export function setupGravity(logger: ILogger = new NullLogger()) {
