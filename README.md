@@ -22,6 +22,8 @@ module.exports = defineConfig({
 });
 ```
 
+**Note:** do not use conditions when calling `gravityCypressPlugin`, otherwise the before and after hooks will fail. If you want to disable tracking (for example while running the test locally), you can simply set the value of `authKey`to `undefined`).
+
 You will then need to set up some before/after each hook. This can be done in `cypress/support/e2e.ts`:
 
 ```typescript

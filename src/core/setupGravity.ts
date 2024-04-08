@@ -3,32 +3,25 @@ import CyLike from "./CyLike";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
 import { CollectorOptions } from "@smartesting/gravity-data-collector";
 
-import ignoreGravityMissingTasks from "../utils/ignoreGravityMissingTasks";
-
 export default function setupGravity(cy: CyLike, logger: ILogger) {
-  ignoreGravityMissingTasks(cy, logger);
-
   cy.task("gravity:getCollectorOptions").then((collectorOptions) => {
+    if (!isPartialCollectorOptions(collectorOptions)) return;
+
     cy.window().then((win) => {
-      function installCollector() {
-        if (!isPartialCollectorOptions(collectorOptions)) return;
-
-        GravityCollector.init({
-          window: win,
-          ...collectorOptions,
-        });
-      }
-
-      function waitForPageToLoad() {
+      function waitForPageToLoad(collectorOptions: Partial<CollectorOptions>) {
         const url = win.document.URL;
+
         if (url === undefined || url.startsWith("about:")) {
-          setTimeout(waitForPageToLoad, 50);
+          setTimeout(() => waitForPageToLoad(collectorOptions), 50);
         } else {
-          installCollector();
+          GravityCollector.init({
+            window: win,
+            ...collectorOptions,
+          });
         }
       }
 
-      waitForPageToLoad();
+      waitForPageToLoad(collectorOptions);
     });
   });
 }

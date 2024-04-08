@@ -35,13 +35,13 @@ describe("teardownGravity", () => {
     gravityDataCollectorStub.restore();
   });
 
-  it("logs an error if task gravity:storeCurrentSessionId is not defined", () => {
-    teardownGravity(mockCy, mockCypress, logger);
-    assert.deepStrictEqual(logger.errors, [
-      [
-        'cy.task("gravity:storeCurrentSessionId") is not defined. Did you add "gravityCypressPlugin(...)" in your E2E setup',
-      ],
-    ]);
+  it("throws an error if task gravity:storeCurrentSessionId is not defined", () => {
+    assert.throws(
+      () => teardownGravity(mockCy, mockCypress, logger),
+      new Error(
+        "CypressError: `cy.task('gravity:storeCurrentSessionId')` failed with the following error",
+      ),
+    );
   });
 
   it("does not fail if GravityCollector was not properly installed", () => {
@@ -51,11 +51,6 @@ describe("teardownGravity", () => {
       ),
     );
     teardownGravity(mockCy, mockCypress, logger);
-    assert.deepStrictEqual(logger.errors, [
-      [
-        'cy.task("gravity:storeCurrentSessionId") is not defined. Did you add "gravityCypressPlugin(...)" in your E2E setup',
-      ],
-    ]);
   });
 
   context("when gravityCypressPlugin() has been properly called", () => {

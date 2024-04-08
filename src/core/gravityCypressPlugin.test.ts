@@ -79,8 +79,6 @@ describe("gravityCypressPlugin", () => {
   });
 
   describe("after:spec", () => {
-    const authKey = uuidv4();
-
     const spec: Cypress.Spec = {
       name: "My spec",
       absolute: "/home/whatever/cypress/e2e",
@@ -122,137 +120,166 @@ describe("gravityCypressPlugin", () => {
       screenshots: [],
     };
 
-    beforeEach(() => {
-      gravityCypressPlugin(
-        mockCy.onPlugin.bind(mockCy),
-        config,
-        { authKey },
-        logger,
-        stubFetch,
-      );
-    });
-
-    context("when no session id is found for the test", () => {
-      it("does not fetch any data", async () => {
-        await mockCy.triggerAfterSpec(spec, results);
-
-        sinon.assert.notCalled(stubFetch);
-      });
-
-      it("logs an error for each test which does not have an associated testId", async () => {
-        await mockCy.triggerAfterSpec(spec, results);
-
-        assert.deepStrictEqual(logger.errors, [
-          ["No session id found for test: My spec/My first test"],
-          ["No session id found for test: My spec/My second test"],
-        ]);
-      });
-    });
-
-    context("when sessions ids are recorded for the tests", () => {
+    context("when no authKey is provided during the setup", () => {
       beforeEach(() => {
-        mockCy.task("gravity:storeCurrentSessionId", {
-          sessionId: "123-456",
-          titlePath: results.tests[0].title,
-        });
-        mockCy.task("gravity:storeCurrentSessionId", {
-          sessionId: "456-789",
-          titlePath: results.tests[1].title,
-        });
-      });
-
-      it("does not log any error", async () => {
-        await mockCy.triggerAfterSpec(spec, results);
-        assert.deepStrictEqual(logger.errors, []);
-      });
-
-      it("identifies each test on Gravity", async () => {
-        await mockCy.triggerAfterSpec(spec, results);
-        sinon.assert.callCount(stubFetch, 2);
-
-        sinon.assert.calledWith(
-          stubFetch,
-          `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/123-456/identifyTest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              testName: "My first test",
-              testPath: "My spec",
-              testDate: "0",
-              testDuration: 123,
-              testStatus: "passed",
-              sessionId: "123-456",
-            }),
-          },
-        );
-
-        sinon.assert.calledWith(
-          stubFetch,
-          `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/456-789/identifyTest`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              testName: "My second test",
-              testPath: "My spec",
-              testDate: "0",
-              testDuration: 789,
-              testStatus: "failed",
-              sessionId: "456-789",
-            }),
-          },
-        );
-      });
-
-      it("uses the custom Gravity domain if provided in the collectorConfiguration", async () => {
         gravityCypressPlugin(
           mockCy.onPlugin.bind(mockCy),
           config,
-          { authKey, gravityServerUrl: "http://localhost:3000" },
+          {},
           logger,
           stubFetch,
         );
-        mockCy.task("gravity:storeCurrentSessionId", {
-          sessionId: "123-456",
-          titlePath: results.tests[0].title,
-        });
-        mockCy.task("gravity:storeCurrentSessionId", {
-          sessionId: "456-789",
-          titlePath: results.tests[1].title,
-        });
-        await mockCy.triggerAfterSpec(spec, results);
-
-        sinon.assert.callCount(stubFetch, 2);
-
-        sinon.assert.calledWith(
-          stubFetch,
-          `http://localhost:3000/api/tracking/${authKey}/session/123-456/identifyTest`,
-        );
-
-        sinon.assert.calledWith(
-          stubFetch,
-          `http://localhost:3000/api/tracking/${authKey}/session/456-789/identifyTest`,
-        );
       });
 
-      it("logs the requests and responses", async () => {
+      it("does not fetch any data", async () => {
+        await mockCy.triggerAfterSpec(spec, results);
+        sinon.assert.notCalled(stubFetch);
+      });
+
+      it("logs an message explaining that the authKey was not set", async () => {
         await mockCy.triggerAfterSpec(spec, results);
 
         assert.deepStrictEqual(logger.logs, [
-          [
-            {
-              url: `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/123-456/identifyTest`,
-              response: { error: null },
-            },
-          ],
-          [
-            {
-              url: `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/456-789/identifyTest`,
-              response: { error: null },
-            },
-          ],
+          ["Gravity authKey is not set: not sending any data"],
         ]);
+      });
+    });
+
+    context("when an authKey is provided during the setup", () => {
+      const authKey = uuidv4();
+
+      beforeEach(() => {
+        gravityCypressPlugin(
+          mockCy.onPlugin.bind(mockCy),
+          config,
+          { authKey },
+          logger,
+          stubFetch,
+        );
+      });
+
+      context("when no session id is found for the test", () => {
+        it("does not fetch any data", async () => {
+          await mockCy.triggerAfterSpec(spec, results);
+
+          sinon.assert.notCalled(stubFetch);
+        });
+
+        it("logs an error for each test which does not have an associated testId", async () => {
+          await mockCy.triggerAfterSpec(spec, results);
+
+          assert.deepStrictEqual(logger.errors, [
+            ["No session id found for test: My spec/My first test"],
+            ["No session id found for test: My spec/My second test"],
+          ]);
+        });
+      });
+
+      context("when sessions ids are recorded for the tests", () => {
+        beforeEach(() => {
+          mockCy.task("gravity:storeCurrentSessionId", {
+            sessionId: "123-456",
+            titlePath: results.tests[0].title,
+          });
+          mockCy.task("gravity:storeCurrentSessionId", {
+            sessionId: "456-789",
+            titlePath: results.tests[1].title,
+          });
+        });
+
+        it("does not log any error", async () => {
+          await mockCy.triggerAfterSpec(spec, results);
+          assert.deepStrictEqual(logger.errors, []);
+        });
+
+        it("identifies each test on Gravity", async () => {
+          await mockCy.triggerAfterSpec(spec, results);
+          sinon.assert.callCount(stubFetch, 2);
+
+          sinon.assert.calledWith(
+            stubFetch,
+            `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/123-456/identifyTest`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                testName: "My first test",
+                testPath: "My spec",
+                testDate: "0",
+                testDuration: 123,
+                testStatus: "passed",
+                sessionId: "123-456",
+              }),
+            },
+          );
+
+          sinon.assert.calledWith(
+            stubFetch,
+            `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/456-789/identifyTest`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                testName: "My second test",
+                testPath: "My spec",
+                testDate: "0",
+                testDuration: 789,
+                testStatus: "failed",
+                sessionId: "456-789",
+              }),
+            },
+          );
+        });
+
+        it("uses the custom Gravity domain if provided in the collectorConfiguration", async () => {
+          gravityCypressPlugin(
+            mockCy.onPlugin.bind(mockCy),
+            config,
+            { authKey, gravityServerUrl: "http://localhost:3000" },
+            logger,
+            stubFetch,
+          );
+          mockCy.task("gravity:storeCurrentSessionId", {
+            sessionId: "123-456",
+            titlePath: results.tests[0].title,
+          });
+          mockCy.task("gravity:storeCurrentSessionId", {
+            sessionId: "456-789",
+            titlePath: results.tests[1].title,
+          });
+          await mockCy.triggerAfterSpec(spec, results);
+
+          sinon.assert.callCount(stubFetch, 2);
+
+          sinon.assert.calledWith(
+            stubFetch,
+            `http://localhost:3000/api/tracking/${authKey}/session/123-456/identifyTest`,
+          );
+
+          sinon.assert.calledWith(
+            stubFetch,
+            `http://localhost:3000/api/tracking/${authKey}/session/456-789/identifyTest`,
+          );
+        });
+
+        it("logs the requests and responses", async () => {
+          await mockCy.triggerAfterSpec(spec, results);
+
+          assert.deepStrictEqual(logger.logs, [
+            [
+              {
+                url: `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/123-456/identifyTest`,
+                response: { error: null },
+              },
+            ],
+            [
+              {
+                url: `https://api.gravity.smartesting.com/api/tracking/${authKey}/session/456-789/identifyTest`,
+                response: { error: null },
+              },
+            ],
+          ]);
+        });
       });
     });
   });

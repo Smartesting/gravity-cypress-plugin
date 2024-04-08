@@ -18,13 +18,18 @@ describe("setupGravity", () => {
     mockCy = new MockCy();
   });
 
-  it("logs an error if task gravity:getCollectorOptions is not defined", () => {
-    setupGravity(mockCy, logger);
-    assert.deepStrictEqual(logger.errors, [
-      [
-        'cy.task("gravity:getCollectorOptions") is not defined. Did you add "gravityCypressPlugin(...)" in your E2E setup',
-      ],
-    ]);
+  /*
+   * Note: it would be nice to be able to avoid a failure here, but it seems pretty difficult to
+   * check in the test if the task was set in the node process.
+   * Adding a `cy.on('fail')`to handle this caused other issues.
+   * */
+  it("fails if task gravity:getCollectorOptions is not defined", () => {
+    assert.throws(
+      () => setupGravity(mockCy, logger),
+      new Error(
+        "CypressError: `cy.task('gravity:getCollectorOptions')` failed with the following error",
+      ),
+    );
   });
 
   context("when gravityCypressPlugin() has been set up", () => {
@@ -40,36 +45,60 @@ describe("setupGravity", () => {
       jsDom = new JSDOM();
       mockCy = new MockCy(jsDom.window);
       gravityDataCollectorStub = sinon.stub(GravityCollector, "init").returns();
-      mockCy.onPlugin("task", {
-        "gravity:getCollectorOptions": () => collectorOptions,
-      });
     });
 
     afterEach(() => {
       gravityDataCollectorStub.restore();
     });
 
-    it("installs the collector on the tested application window", () => {
-      jsDom.reconfigure({ url: "https://example.com" });
-      setupGravity(mockCy, logger);
-      sinon.assert.calledWith(gravityDataCollectorStub, {
-        window: jsDom.window,
-        ...collectorOptions,
+    context("when no authKey is provided", () => {
+      beforeEach(() => {
+        mockCy.onPlugin("task", {
+          "gravity:getCollectorOptions": () => {},
+        });
+      });
+
+      it("does not install the collector on the tested application window", () => {
+        jsDom.reconfigure({ url: "https://example.com" });
+        setupGravity(mockCy, logger);
+        sinon.assert.notCalled(gravityDataCollectorStub);
       });
     });
 
-    it('waits for the window to point to something else than "about:blank" before installing the collector', async () => {
-      jsDom.reconfigure({ url: "about:blank" });
+    context("when an authKey is provided", () => {
+      const collectorOptions: CollectorOptionsWithAuthKey = {
+        authKey: uuidv4(),
+        gravityServerUrl: "http://localhost:3000",
+      };
 
-      setupGravity(mockCy, logger);
-      sinon.assert.notCalled(gravityDataCollectorStub);
+      beforeEach(() => {
+        mockCy.onPlugin("task", {
+          "gravity:getCollectorOptions": () => collectorOptions,
+        });
+      });
 
-      jsDom.reconfigure({ url: "https://example.com" });
-
-      await waitForAssertion(() => {
+      it("installs the collector on the tested application window", () => {
+        jsDom.reconfigure({ url: "https://example.com" });
+        setupGravity(mockCy, logger);
         sinon.assert.calledWith(gravityDataCollectorStub, {
           window: jsDom.window,
           ...collectorOptions,
+        });
+      });
+
+      it('waits for the window to point to something else than "about:blank" before installing the collector', async () => {
+        jsDom.reconfigure({ url: "about:blank" });
+
+        setupGravity(mockCy, logger);
+        sinon.assert.notCalled(gravityDataCollectorStub);
+
+        jsDom.reconfigure({ url: "https://example.com" });
+
+        await waitForAssertion(() => {
+          sinon.assert.calledWith(gravityDataCollectorStub, {
+            window: jsDom.window,
+            ...collectorOptions,
+          });
         });
       });
     });

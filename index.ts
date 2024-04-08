@@ -1,16 +1,15 @@
-import gravityCypressPluginCore, {
-  CollectorOptionsWithAuthKey,
-} from "./src/core/gravityCypressPlugin";
+import gravityCypressPluginCore from "./src/core/gravityCypressPlugin";
 import ILogger from "./src/logger/ILogger";
 import NullLogger from "./src/logger/NullLogger";
 import setupGravityCore from "./src/core/setupGravity";
 import teardownGravityCore from "./src/core/teardownGravity";
 import fetch from "cross-fetch";
+import { CollectorOptions } from "@smartesting/gravity-data-collector";
 
 export function gravityCypressPlugin(
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions,
-  collectorOptions: CollectorOptionsWithAuthKey,
+  collectorOptions: Partial<CollectorOptions>,
 ) {
   return gravityCypressPluginCore(
     on,

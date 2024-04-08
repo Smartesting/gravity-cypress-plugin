@@ -9,7 +9,7 @@ export type CollectorOptionsWithAuthKey = Partial<CollectorOptions> & {
 export default function gravityCypressPlugin(
   on: Cypress.PluginEvents,
   _config: Cypress.PluginConfigOptions,
-  collectorOptions: CollectorOptionsWithAuthKey,
+  collectorOptions: Partial<CollectorOptions>,
   logger: ILogger,
   fetch: typeof cFetch,
 ) {
@@ -32,6 +32,11 @@ export default function gravityCypressPlugin(
   });
 
   on("after:spec", async (_spec, results) => {
+    if (!collectorOptions.authKey) {
+      logger.log("Gravity authKey is not set: not sending any data");
+      return;
+    }
+
     const gravityServerUrl =
       collectorOptions.gravityServerUrl ??
       "https://api.gravity.smartesting.com";
