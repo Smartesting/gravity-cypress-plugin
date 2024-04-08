@@ -208,7 +208,6 @@ describe("gravityCypressPlugin", () => {
                 testDate: "0",
                 testDuration: 123,
                 testStatus: "passed",
-                sessionId: "123-456",
               }),
             },
           );
@@ -225,7 +224,6 @@ describe("gravityCypressPlugin", () => {
                 testDate: "0",
                 testDuration: 789,
                 testStatus: "failed",
-                sessionId: "456-789",
               }),
             },
           );

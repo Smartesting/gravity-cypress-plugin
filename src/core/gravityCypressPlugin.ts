@@ -56,7 +56,6 @@ export default function gravityCypressPlugin(
             testDate: results.stats.startedAt,
             testDuration: test.duration,
             testStatus: test.state,
-            sessionId,
           }),
         });
         logger.log({
