@@ -35,9 +35,9 @@ jobs:
           tags: "*-beta*"
           library_name: smartesting-gravity-cypress-plugin
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
-          path: ${{ env.BUILD_PATH }}/pages
+          path: pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
