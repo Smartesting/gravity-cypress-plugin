@@ -15,6 +15,7 @@ export default class MockCy implements CyLike {
   private readonly tasks: Tasks = {};
   private readonly failHandlers: FailListener[] = [];
   private afterSpec: AfterSpec | undefined;
+  private readonly eventListeners: { [key: string]: unknown } = {};
 
   constructor(private readonly win: unknown = null) {}
 
@@ -36,6 +37,18 @@ export default class MockCy implements CyLike {
     );
   };
 
+  public triggerEvent(event: string, args: unknown[]) {
+    if (!Object.keys(this.eventListeners).includes(event)) {
+      throw new Error(`No listener recorded for ${event}`);
+    }
+    const listener = this.eventListeners[event];
+    if (!(listener instanceof Function))
+      throw new Error(
+        `Listener recorded for ${event} is not callable. Got: ${listener}`,
+      );
+    return listener(...args);
+  }
+
   public triggerAfterSpec(
     spec: Cypress.Spec,
     results: CypressCommandLine.RunResult,
@@ -51,11 +64,15 @@ export default class MockCy implements CyLike {
       case "fail":
         this.failHandlers.push(<FailListener>listener);
         return defaultResponse;
-    }
 
-    throw new Error(
-      `Event ${String(event)} is not handled currently by MockCy`,
-    );
+      default:
+        if (typeof event !== "string")
+          throw new Error(
+            `On string events are handled by MockCY, got: ${String(event)}`,
+          );
+        this.eventListeners[event] = listener;
+        return defaultResponse;
+    }
   };
 
   public task<S = unknown>(taskName: string, arg?: any): Cypress.Chainable<S> {

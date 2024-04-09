@@ -87,7 +87,7 @@ describe("Integration test", function () {
     const settingsLog = logs.filter((log) => log.url.endsWith("/settings"));
     assert.strictEqual(
       settingsLog.length,
-      2,
+      4,
       "Settings have been queried by gravity-data-collector for each test",
     );
 
@@ -96,7 +96,7 @@ describe("Integration test", function () {
     );
     assert.strictEqual(
       identifyLogs.length,
-      2,
+      3,
       "Each test has been identified on Gravity",
     );
   });
@@ -105,8 +105,12 @@ describe("Integration test", function () {
     it("still run the tests", async () => {
       process.env.DISABLE_GRAVITY_PLUGIN = "1";
       await runCypressTests();
-
-      assert.strictEqual(logs.length, 2);
+      assert.deepStrictEqual(logs, [
+        { url: "/?test=firstTest", method: "GET" },
+        { url: "/?test=secondTest", method: "GET" },
+        { url: "/?test=thirdTest", method: "GET" },
+        { url: "/?test=thirdTest", method: "GET" }, // The page is reloaded in the test
+      ]);
     });
   });
 });

@@ -7,22 +7,35 @@ export default function setupGravity(cy: CyLike, logger: ILogger) {
   return cy.task("gravity:getCollectorOptions").then((collectorOptions) => {
     if (!isPartialCollectorOptions(collectorOptions)) return;
 
-    cy.window().then((win) => {
-      function waitForPageToLoad(collectorOptions: Partial<CollectorOptions>) {
-        const url = win.document.URL;
-
-        if (url === undefined || url.startsWith("about:")) {
-          setTimeout(() => waitForPageToLoad(collectorOptions), 50);
-        } else {
-          GravityCollector.init({
-            window: win,
-            ...collectorOptions,
-          });
-        }
+    cy.on("command:end", (args) => {
+      if (args.attributes.name === "reload") {
+        installGravityCollector(cy, collectorOptions);
       }
-
-      waitForPageToLoad(collectorOptions);
     });
+
+    return installGravityCollector(cy, collectorOptions);
+  });
+}
+
+function installGravityCollector(
+  cy: CyLike,
+  collectorOptions: Partial<CollectorOptions>,
+) {
+  return cy.window().then((win) => {
+    function waitForPageToLoad(collectorOptions: Partial<CollectorOptions>) {
+      const url = win.document.URL;
+
+      if (url === undefined || url.startsWith("about:")) {
+        setTimeout(() => waitForPageToLoad(collectorOptions), 50);
+      } else {
+        GravityCollector.init({
+          window: win,
+          ...collectorOptions,
+        });
+      }
+    }
+
+    waitForPageToLoad(collectorOptions);
   });
 }
 

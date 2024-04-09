@@ -101,6 +101,16 @@ describe("setupGravity", () => {
           });
         });
       });
+
+      it("reinstalls Gravity plugin after reloading the window", async () => {
+        jsDom.reconfigure({ url: "https://example.com" });
+        setupGravity(mockCy, logger);
+        mockCy.triggerEvent("command:end", [
+          { attributes: { name: "reload" } },
+        ]);
+
+        sinon.assert.calledTwice(gravityDataCollectorStub);
+      });
     });
   });
 });
