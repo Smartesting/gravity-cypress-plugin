@@ -16,9 +16,9 @@ export function gravityCypressPlugin(
 }
 
 export function setupGravity(logger: ILogger = new NullLogger()) {
-  setupGravityCore(cy, logger);
+  return setupGravityCore(cy, logger);
 }
 
 export function teardownGravity(logger: ILogger = new NullLogger()) {
-  teardownGravityCore(cy, Cypress, logger);
+  return teardownGravityCore(cy, Cypress, logger);
 }

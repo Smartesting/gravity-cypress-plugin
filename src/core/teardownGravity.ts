@@ -8,7 +8,7 @@ export default function teardownGravity(
   cypress: CypressLike,
   logger: ILogger,
 ) {
-  cy.window().then((win) => {
+  return cy.window().then((win) => {
     const { titlePath } = cypress.currentTest;
     const sessionId = getSessionId(win);
 

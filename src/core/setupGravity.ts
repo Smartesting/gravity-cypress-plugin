@@ -4,7 +4,7 @@ import GravityCollector from "@smartesting/gravity-data-collector/dist";
 import { CollectorOptions } from "@smartesting/gravity-data-collector";
 
 export default function setupGravity(cy: CyLike, logger: ILogger) {
-  cy.task("gravity:getCollectorOptions").then((collectorOptions) => {
+  return cy.task("gravity:getCollectorOptions").then((collectorOptions) => {
     if (!isPartialCollectorOptions(collectorOptions)) return;
 
     cy.window().then((win) => {
