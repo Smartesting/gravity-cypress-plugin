@@ -46,7 +46,7 @@ export default function gravityCypressPlugin(
       const sessionId = sessionIdByTest[testTitle];
 
       if (sessionId) {
-        const url = `${gravityServerUrl}/api/tracking/${collectorOptions.authKey}/session/${sessionId}/identifyTest`;
+        const url = `${gravityServerUrl}${gravityServerUrl.endsWith("/") ? "" : "/"}api/tracking/${collectorOptions.authKey}/session/${sessionId}/identifyTest`;
         const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

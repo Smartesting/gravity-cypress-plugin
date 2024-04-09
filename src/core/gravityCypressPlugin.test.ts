@@ -176,7 +176,7 @@ describe("gravityCypressPlugin", () => {
       });
 
       context("when sessions ids are recorded for the tests", () => {
-        beforeEach(() => {
+        function declareSessions() {
           mockCy.task("gravity:storeCurrentSessionId", {
             sessionId: "123-456",
             titlePath: results.tests[0].title,
@@ -185,6 +185,10 @@ describe("gravityCypressPlugin", () => {
             sessionId: "456-789",
             titlePath: results.tests[1].title,
           });
+        }
+
+        beforeEach(() => {
+          declareSessions();
         });
 
         it("does not log any error", async () => {
@@ -237,14 +241,7 @@ describe("gravityCypressPlugin", () => {
             logger,
             stubFetch,
           );
-          mockCy.task("gravity:storeCurrentSessionId", {
-            sessionId: "123-456",
-            titlePath: results.tests[0].title,
-          });
-          mockCy.task("gravity:storeCurrentSessionId", {
-            sessionId: "456-789",
-            titlePath: results.tests[1].title,
-          });
+          declareSessions();
           await mockCy.triggerAfterSpec(spec, results);
 
           sinon.assert.callCount(stubFetch, 2);
@@ -277,6 +274,29 @@ describe("gravityCypressPlugin", () => {
               },
             ],
           ]);
+        });
+
+        it("constructs a correct URL for identifying the tests", async () => {
+          gravityCypressPlugin(
+            mockCy.onPlugin.bind(mockCy),
+            config,
+            { authKey, gravityServerUrl: "http://localhost:3000/" },
+            logger,
+            stubFetch,
+          );
+          declareSessions();
+          await mockCy.triggerAfterSpec(spec, results);
+
+          sinon.assert.callCount(stubFetch, 2);
+          sinon.assert.calledWith(
+            stubFetch,
+            `http://localhost:3000/api/tracking/${authKey}/session/123-456/identifyTest`,
+          );
+
+          sinon.assert.calledWith(
+            stubFetch,
+            `http://localhost:3000/api/tracking/${authKey}/session/456-789/identifyTest`,
+          );
         });
       });
     });
