@@ -17,7 +17,9 @@ import { gravityCypressPlugin } from '@smartesting/gravity-cypress-plugin'
 
 module.exports = defineConfig({
   e2e: {
-    gravityCypressPlugin(on, config, { authKey: "Your test collection auth key" });
+    setupNodeEvents(on, config) {
+      gravityCypressPlugin(on, config, { authKey: "Your test collection auth key" });
+    }
   },
 });
 ```
