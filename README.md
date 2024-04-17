@@ -13,13 +13,15 @@ npm i --save-dev @smartesting/gravity-cypress-plugin
 You then need to hook the plugin in Cypress, this is typically done in `cypress.config.ts`:
 
 ```typescript
-import { gravityCypressPlugin } from '@smartesting/gravity-cypress-plugin'
+import { gravityCypressPlugin } from "@smartesting/gravity-cypress-plugin";
 
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      gravityCypressPlugin(on, config, { authKey: "Your test collection auth key" });
-    }
+      gravityCypressPlugin(on, config, {
+        authKey: "Your test collection auth key",
+      });
+    },
   },
 });
 ```
