@@ -27,6 +27,43 @@ export default function makeTestRouter() {
 `);
   });
 
+  router.get("/collector-enabled", express.text(), (req, res) => {
+    const port = req.query.testServerPort ?? 3001;
+
+    res.status(200).send(`
+<html>
+    <head>
+        <script async id="logger" type="text/javascript" src="https://smartesting.github.io/gravity-data-collector/v6.0.0-1-beta/gravity-logger-min.js"></script>
+        <title>Simple test app</title>
+    </head>
+    <script>
+      const script = document.querySelector('#logger')
+      script.addEventListener('load', function () {
+        window.GravityCollector.init({
+          authKey: '123123-123-123-123-123123',
+          gravityServerUrl: 'http://localhost:${port}'
+        })
+      })
+    </script>
+
+    <script>
+      function handleClick() {
+          const clickList = document.getElementById('output');
+          const item = document.createElement('li')
+          item.append('Got clicked')
+          clickList.appendChild(item)
+      }
+    </script>
+    <body>
+        <button title="Click me" onclick="handleClick()">Click me :)</button>
+        <ul id="output">
+        
+        </ul>
+    </body>
+</html>
+`);
+  });
+
   router.get(
     "/api/tracking/:sessionCollectionAuthKey/settings",
     (_req, res) => {
@@ -58,6 +95,13 @@ export default function makeTestRouter() {
 
   router.post(
     "/api/tracking/:sessionCollectionAuthKey/session/:sessionId/identifyTest",
+    (_req, res) => {
+      res.status(200).json({ error: null });
+    },
+  );
+
+  router.post(
+    "/api/tracking/:sessionCollectionAuthKey/snapshots/:snapshotId",
     (_req, res) => {
       res.status(200).json({ error: null });
     },

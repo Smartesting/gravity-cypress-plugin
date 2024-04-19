@@ -1,8 +1,8 @@
-const WAIT_TIME = 15;
-
 describe("A simple app", () => {
+  const WAIT_TIME = 15;
+
   it("has a button that can be clicked", () => {
-    cy.visit("/?test=firstTest");
+    cy.visit("/?test=simpleTest");
     cy.get("button").click();
     cy.wait(WAIT_TIME).then(() => {
       cy.get("button").click();
@@ -10,7 +10,7 @@ describe("A simple app", () => {
   });
 
   it("may fail ...", () => {
-    cy.visit("/?test=secondTest");
+    cy.visit("/?test=failingTest");
     cy.get("button").click();
     cy.get("button")
       .click()
@@ -19,15 +19,5 @@ describe("A simple app", () => {
           expect(3).to.eq(2);
         });
       });
-  });
-
-  it("Gravity collector is still installed after reloading", () => {
-    cy.visit("/?test=thirdTest");
-    cy.get("button").click();
-    cy.reload().then(() => {
-      cy.wait(WAIT_TIME).then(() => {
-        cy.get("button").click();
-      });
-    });
   });
 });

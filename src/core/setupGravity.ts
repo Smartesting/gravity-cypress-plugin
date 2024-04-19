@@ -28,7 +28,7 @@ function installGravityCollector(
       if (url === undefined || url.startsWith("about:")) {
         setTimeout(() => waitForPageToLoad(collectorOptions), 50);
       } else {
-        GravityCollector.init({
+        GravityCollector.initWithOverride({
           window: win,
           ...collectorOptions,
         });

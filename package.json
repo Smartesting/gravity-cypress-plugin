@@ -23,7 +23,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@smartesting/gravity-data-collector": "https://smartesting.github.io/gravity-data-collector/v6.0.0-beta/smartesting-gravity-data-collector.tgz",
+    "@smartesting/gravity-data-collector": "https://smartesting.github.io/gravity-data-collector/v6.0.0-1-beta/smartesting-gravity-data-collector.tgz",
     "cross-fetch": "^4.0.0",
     "uuid": "^9.0.1"
   },

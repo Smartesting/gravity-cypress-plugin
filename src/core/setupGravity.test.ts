@@ -44,7 +44,9 @@ describe("setupGravity", () => {
     beforeEach(() => {
       jsDom = new JSDOM();
       mockCy = new MockCy(jsDom.window);
-      gravityDataCollectorStub = sinon.stub(GravityCollector, "init").returns();
+      gravityDataCollectorStub = sinon
+        .stub(GravityCollector, "initWithOverride")
+        .returns();
     });
 
     afterEach(() => {
