@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import makeTestRouter from "./utils/testServerRouter";
 import assert from "assert";
 
@@ -6,6 +6,7 @@ import { run } from "cypress";
 import { AddressInfo } from "net";
 import { afterEach } from "mocha";
 import * as process from "process";
+import { SessionUserAction } from "../../gravity-data-collector";
 
 type Log = {
   method: string;
@@ -34,6 +35,12 @@ describe("Integration test", function () {
   let cypressRunOptions: Partial<CypressCommandLine.CypressRunOptions> = {
     browser: "electron",
     testingType: "e2e",
+    quiet: true,
+    reporter: "junit",
+    reporterOptions: {
+      toConsole: false,
+      outputs: false,
+    },
   };
 
   async function runCypressTests(
@@ -50,6 +57,7 @@ describe("Integration test", function () {
   async function startServer(): Promise<Stop> {
     return new Promise<Stop>((resolve, reject) => {
       const app = express();
+      app.use(json());
       app.use((req, _res, next) => {
         const log: Log = {
           url: req.originalUrl,
@@ -62,11 +70,7 @@ describe("Integration test", function () {
           contentType.includes("application/json") &&
           req.body
         ) {
-          try {
-            log.body = JSON.parse(req.body);
-          } catch (err) {
-            console.error("Unable to parse JSON body:", req.body);
-          }
+          log.body = req.body;
         }
         logs.push(log);
         next();
@@ -155,6 +159,30 @@ describe("Integration test", function () {
       );
 
       assert.deepStrictEqual(logsForProductionCollection, []);
+    });
+
+    it("it uses a single session ID even after a reload", async () => {
+      await runCypressTests({
+        spec: "cypress/e2e/withCollectorEnabledAndReload.cy.ts",
+      });
+
+      const logsForProductionCollection = logs.filter((log) =>
+        log.url.includes("123123-123-123-123-123123"),
+      );
+      assert.deepStrictEqual(logsForProductionCollection, []);
+
+      const sessionIds = logs.reduce((acc, log) => {
+        if (log.body && log.url.endsWith("/publish")) {
+          if (Array.isArray(log.body)) {
+            for (const sessionUserAction of log.body) {
+              acc.add(sessionUserAction.sessionId);
+            }
+          }
+        }
+        return acc;
+      }, new Set<string>());
+
+      assert.deepStrictEqual(sessionIds.size, 1);
     });
   });
 });

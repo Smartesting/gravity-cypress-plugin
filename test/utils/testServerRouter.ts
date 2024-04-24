@@ -33,7 +33,7 @@ export default function makeTestRouter() {
     res.status(200).send(`
 <html>
     <head>
-        <script async id="logger" type="text/javascript" src="https://smartesting.github.io/gravity-data-collector/v6.0.0-1-beta/gravity-logger-min.js"></script>
+        <script async id="logger" type="text/javascript" src="https://smartesting.github.io/gravity-data-collector/v6.0.0-2-beta/gravity-logger-min.js"></script>
         <title>Simple test app</title>
     </head>
     <script>

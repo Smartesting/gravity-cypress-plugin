@@ -63,6 +63,12 @@ describe("setupGravity", () => {
       it("does not install the collector on the tested application window", () => {
         jsDom.reconfigure({ url: "https://example.com" });
         setupGravity(mockCy, logger);
+
+        assert.throws(
+          () => mockCy.triggerEvent("window:before:load", [jsDom.window]),
+          new Error("No listener recorded for window:before:load"),
+        );
+
         sinon.assert.notCalled(gravityDataCollectorStub);
       });
     });
@@ -82,6 +88,8 @@ describe("setupGravity", () => {
       it("installs the collector on the tested application window", () => {
         jsDom.reconfigure({ url: "https://example.com" });
         setupGravity(mockCy, logger);
+        mockCy.triggerEvent("window:before:load", [jsDom.window]);
+
         sinon.assert.calledWith(gravityDataCollectorStub, {
           window: jsDom.window,
           ...collectorOptions,
@@ -92,6 +100,7 @@ describe("setupGravity", () => {
         jsDom.reconfigure({ url: "about:blank" });
 
         setupGravity(mockCy, logger);
+        mockCy.triggerEvent("window:before:load", [jsDom.window]);
         sinon.assert.notCalled(gravityDataCollectorStub);
 
         jsDom.reconfigure({ url: "https://example.com" });
@@ -107,9 +116,10 @@ describe("setupGravity", () => {
       it("reinstalls Gravity plugin after reloading the window", async () => {
         jsDom.reconfigure({ url: "https://example.com" });
         setupGravity(mockCy, logger);
-        mockCy.triggerEvent("command:end", [
-          { attributes: { name: "reload" } },
-        ]);
+
+        mockCy.triggerEvent("window:before:load", [jsDom.window]);
+        // "Reloading" the window
+        mockCy.triggerEvent("window:before:load", [jsDom.window]);
 
         sinon.assert.calledTwice(gravityDataCollectorStub);
       });
