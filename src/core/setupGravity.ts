@@ -2,41 +2,41 @@ import ILogger from "../logger/ILogger";
 import CyLike from "./CyLike";
 import GravityCollector from "@smartesting/gravity-data-collector/dist";
 import { CollectorOptions } from "@smartesting/gravity-data-collector";
+import { v4 as uuidv4 } from "uuid";
 
 export default function setupGravity(cy: CyLike, logger: ILogger) {
+  const sessionId = uuidv4();
   return cy.task("gravity:getCollectorOptions").then((collectorOptions) => {
     if (!isPartialCollectorOptions(collectorOptions)) return;
 
-    cy.on("command:end", (args) => {
-      if (args.attributes.name === "reload") {
-        installGravityCollector(cy, collectorOptions);
-      }
+    return cy.on("window:before:load", (win) => {
+      installGravityCollector(win, collectorOptions, sessionId);
     });
-
-    return installGravityCollector(cy, collectorOptions);
   });
 }
 
 function installGravityCollector(
-  cy: CyLike,
+  win: Cypress.AUTWindow,
   collectorOptions: Partial<CollectorOptions>,
+  sessionId: string,
 ) {
-  return cy.window().then((win) => {
-    function waitForPageToLoad(collectorOptions: Partial<CollectorOptions>) {
-      const url = win.document.URL;
+  function waitForPageToLoad(collectorOptions: Partial<CollectorOptions>) {
+    const url = win.document.URL;
 
-      if (url === undefined || url.startsWith("about:")) {
-        setTimeout(() => waitForPageToLoad(collectorOptions), 50);
-      } else {
-        GravityCollector.init({
+    if (url === undefined || url.startsWith("about:")) {
+      setTimeout(() => waitForPageToLoad(collectorOptions), 5);
+    } else {
+      GravityCollector.initWithOverride(
+        {
           window: win,
           ...collectorOptions,
-        });
-      }
+        },
+        sessionId,
+      );
     }
+  }
 
-    waitForPageToLoad(collectorOptions);
-  });
+  waitForPageToLoad(collectorOptions);
 }
 
 function isPartialCollectorOptions(

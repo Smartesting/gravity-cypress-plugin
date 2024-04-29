@@ -7,6 +7,9 @@ const baseUrl = `http://localhost:${process.env.TEST_SERVER_PORT ?? "3001"}`;
 export default defineConfig({
   e2e: {
     baseUrl,
+    env: {
+      ...process.env,
+    },
     setupNodeEvents(on, config) {
       gravityCypressPlugin(on, config, {
         authKey: process.env.DISABLE_GRAVITY_PLUGIN ? undefined : uuidv4(),
