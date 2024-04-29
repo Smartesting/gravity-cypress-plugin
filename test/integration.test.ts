@@ -6,7 +6,6 @@ import { run } from "cypress";
 import { AddressInfo } from "net";
 import { afterEach } from "mocha";
 import * as process from "process";
-import { SessionUserAction } from "../../gravity-data-collector";
 
 type Log = {
   method: string;
