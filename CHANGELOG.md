@@ -17,6 +17,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Removed
 
+### Fixed
+
+- Deployment workflow to npmjs
+
 ## [0.1.0](https://github.com/Smartesting/gravity-data-collector/compare/bae154a25f8e8fd5c3f5bb893c81a52c6c7b3c18...v0.1.0)
 
 ### Added
