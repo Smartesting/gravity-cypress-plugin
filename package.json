@@ -1,6 +1,6 @@
 {
   "name": "@smartesting/gravity-cypress-plugin",
-  "version": "0.1.3-beta",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "private": false,
@@ -24,7 +24,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@smartesting/gravity-data-collector": "https://smartesting.github.io/gravity-data-collector/v6.1.4-beta/smartesting-gravity-data-collector.tgz",
+    "@smartesting/gravity-data-collector": "^6.0.0",
     "cross-fetch": "^4.0.0",
     "uuid": "^9.0.1"
   },
