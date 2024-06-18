@@ -1,6 +1,6 @@
 {
   "name": "@smartesting/gravity-cypress-plugin",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "private": false,
@@ -19,6 +19,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --e2e --browser=electron",
     "start:server": "ts-node test/utils/testServer.ts",
+    "prepublishOnly": "npm run build && npm run test:unit && npm run prettier:check && INTEGRATION_TEST_TIMEOUT=30000 npm run test:integration",
     "prettier:check": "prettier . --check",
     "prettier:write": "prettier . --write",
     "prepare": "husky"
