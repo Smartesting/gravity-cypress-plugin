@@ -212,6 +212,7 @@ describe("gravityCypressPlugin", () => {
                 testDate: "0",
                 testDuration: 123,
                 testStatus: "passed",
+                testSource: "cypress",
               }),
             },
           );
@@ -228,6 +229,7 @@ describe("gravityCypressPlugin", () => {
                 testDate: "0",
                 testDuration: 789,
                 testStatus: "failed",
+                testSource: "cypress",
               }),
             },
           );
