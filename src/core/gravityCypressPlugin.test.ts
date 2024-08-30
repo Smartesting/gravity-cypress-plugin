@@ -213,6 +213,7 @@ describe("gravityCypressPlugin", () => {
                 testDuration: 123,
                 testStatus: "passed",
                 testSource: "cypress",
+                testKind: "automated",
               }),
             },
           );
@@ -230,6 +231,7 @@ describe("gravityCypressPlugin", () => {
                 testDuration: 789,
                 testStatus: "failed",
                 testSource: "cypress",
+                testKind: "automated",
               }),
             },
           );

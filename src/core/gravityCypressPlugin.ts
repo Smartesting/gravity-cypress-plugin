@@ -57,6 +57,7 @@ export default function gravityCypressPlugin(
             testDuration: test.duration,
             testStatus: test.state,
             testSource: "cypress",
+            testKind: "automated",
           }),
         });
         logger.log({
