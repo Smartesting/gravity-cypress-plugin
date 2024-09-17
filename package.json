@@ -25,7 +25,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@smartesting/gravity-data-collector": "^7.0.1",
+    "@smartesting/gravity-data-collector": "^8.0.0",
     "cross-fetch": "^4.0.0",
     "uuid": "^9.0.1"
   },
